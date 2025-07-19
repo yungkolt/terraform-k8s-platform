@@ -1,0 +1,39 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/**'
+      - '.github/workflows/deploy.yml'
+
+env:
+  CLUSTER_NAME: aks-platform
+  RESOURCE_GROUP: rg-k8s-platform
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Get AKS Credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.CLUSTER_NAME }}
+      
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f kubernetes/
+      
+      - name: Verify Deployment
+        run: |
+          kubectl rollout status deployment/sample-app
+          kubectl get pods
+          kubectl get ingress
