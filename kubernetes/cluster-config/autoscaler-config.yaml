@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-autoscaler-status
+  namespace: kube-system
+data:
+  nodes.max: "20"
+  nodes.min: "2"
+  scale-down-delay-after-add: "10m"
+  scale-down-unneeded-time: "10m"
+  scale-down-utilization-threshold: "0.5"
+  skip-nodes-with-local-storage: "true"
+  balance-similar-node-groups: "true"
+  expander: "least-waste"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: default
+spec:
+  hard:
+    requests.cpu: "100"
+    requests.memory: 200Gi
+    limits.cpu: "200"
+    limits.memory: 400Gi
+    persistentvolumeclaims: "10"
