@@ -43,3 +43,13 @@ echo "📊 Access Grafana:"
 echo "kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80"
 echo "Username: admin"
 echo "Password: admin123"
+
+# Deploy custom dashboards
+echo "📈 Deploying custom Grafana dashboards..."
+kubectl apply -f kubernetes/monitoring/aks-dashboard.yaml
+
+# Wait for Grafana to be ready
+echo "⏳ Waiting for Grafana to be ready..."
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana -n monitoring --timeout=300s
+
+echo "✅ Monitoring stack deployed!"
