@@ -35,7 +35,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   oms_agent {
-    log_analytics_workspace_id = var.log_analytics_workspace_id
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
   }
 
   tags = var.tags

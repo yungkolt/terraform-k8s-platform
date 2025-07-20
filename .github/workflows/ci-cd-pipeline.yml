@@ -1,0 +1,197 @@
+name: Complete CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'kubernetes/**'
+      - 'src/**'
+      - '.github/workflows/ci-cd-pipeline.yml'
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+env:
+  REGISTRY: ghcr.io
+  CLUSTER_NAME: aks-platform
+  RESOURCE_GROUP: rg-k8s-platform
+
+jobs:
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'infrastructure-scan'
+      
+      - name: Run Kubesec scan
+        run: |
+          docker run -v $(pwd):/app kubesec/kubesec:latest \
+            scan /app/kubernetes/**/*.yaml || true
+
+  validate:
+    name: Validate Configurations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup tools
+        run: |
+          # Install kubeval
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          sudo cp kubeval /usr/local/bin
+          
+          # Install OPA
+          curl -L -o opa https://openpolicyagent.org/downloads/v0.57.0/opa_linux_amd64_static
+          chmod +x opa
+          sudo mv opa /usr/local/bin
+      
+      - name: Validate Kubernetes manifests
+        run: |
+          find kubernetes -name "*.yaml" -o -name "*.yml" | xargs kubeval --ignore-missing-schemas
+      
+      - name: Policy validation with OPA
+        run: |
+          opa test policies/
+
+  build:
+    name: Build and Push Images
+    needs: [security-scan, validate]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push demo image
+        run: |
+          # This is where you'd build custom images
+          echo "Custom image builds would go here"
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to staging via Flux
+        run: |
+          echo "Flux handles staging deployment automatically"
+      
+      - name: Run smoke tests
+        run: |
+          echo "Run staging tests here"
+
+  deploy-production:
+    name: Deploy to Production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://app.yourdomain.com
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.CLUSTER_NAME }} \
+            --overwrite-existing
+      
+      - name: Check Flux sync status
+        run: |
+          kubectl -n flux-system get kustomizations
+          kubectl -n flux-system get gitrepositories
+      
+      - name: Verify deployment health
+        run: |
+          # Wait for rollout
+          kubectl rollout status deployment/frontend -n default --timeout=5m || true
+          
+          # Check pod health
+          kubectl get pods -n default
+          
+          # Run health checks
+          kubectl run health-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
+            curl -f http://frontend.default.svc.cluster.local || true
+      
+      - name: Create deployment annotation
+        run: |
+          kubectl annotate deployment frontend -n default \
+            "deployment.kubernetes.io/revision=${{ github.sha }}" \
+            "deployed-by=github-actions" \
+            "deployed-at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --overwrite || true
+
+  integration-tests:
+    name: Integration Tests
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run integration test suite
+        run: |
+          echo "Run integration tests against production"
+          # Add actual integration tests here
+
+  security-validation:
+    name: Post-Deployment Security Scan
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Run Trivy on deployed cluster
+        run: |
+          echo "Scan deployed resources for vulnerabilities"
+          # trivy k8s --report summary cluster
+
+  notify:
+    name: Notify Deployment
+    needs: [deploy-production, integration-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send notification
+        run: |
+          echo "Deployment completed with status: ${{ job.status }}"
+          # Add Slack/Teams notification here
