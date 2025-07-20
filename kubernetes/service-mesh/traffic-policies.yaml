@@ -1,0 +1,25 @@
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  server:
+    name: frontend
+  client:
+    meshTLS:
+      identities:
+        - "productcatalog.default.serviceaccount.identity.linkerd.cluster.local"
+        - "cart.default.serviceaccount.identity.linkerd.cluster.local"
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  port: 8080
+  proxyProtocol: "HTTP/2"
