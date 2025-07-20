@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-sre-golden-signals
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  sre-golden-signals.json: |
+    {
+      "dashboard": {
+        "title": "SRE Golden Signals",
+        "panels": [
+          {
+            "title": "Request Rate (Traffic)",
+            "targets": [{
+              "expr": "service:request_rate"
+            }],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "title": "Error Rate",
+            "targets": [{
+              "expr": "service:error_ratio"
+            }],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "title": "Latency (p50, p95, p99)",
+            "targets": [
+              {"expr": "service:request_duration_seconds:p50", "legendFormat": "p50"},
+              {"expr": "service:request_duration_seconds:p95", "legendFormat": "p95"},
+              {"expr": "service:request_duration_seconds:p99", "legendFormat": "p99"}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+          },
+          {
+            "title": "Saturation (CPU/Memory)",
+            "targets": [
+              {"expr": "namespace:container_cpu_usage:sum", "legendFormat": "CPU"},
+              {"expr": "namespace:container_memory_usage:sum / 1024 / 1024 / 1024", "legendFormat": "Memory (GB)"}
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+          }
+        ]
+      }
+    }
