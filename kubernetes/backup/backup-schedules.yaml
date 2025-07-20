@@ -1,0 +1,35 @@
+# Daily backup of all namespaces
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-all-namespaces
+  namespace: velero
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  template:
+    ttl: 720h  # 30 days retention
+    includeClusterResources: true
+    excludedNamespaces:
+    - kube-system
+    - kube-public
+    - kube-node-lease
+    storageLocation: default
+---
+# Hourly backup of production apps
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: hourly-production-apps
+  namespace: velero
+spec:
+  schedule: "0 * * * *"  # Every hour
+  template:
+    ttl: 168h  # 7 days retention
+    includeClusterResources: false
+    includedNamespaces:
+    - default
+    - production
+    labelSelector:
+      matchLabels:
+        environment: production
+    storageLocation: default

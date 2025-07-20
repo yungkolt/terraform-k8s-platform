@@ -1,0 +1,43 @@
+# Velero Helm values for Azure
+configuration:
+  provider: azure
+  backupStorageLocation:
+    name: default
+    provider: azure
+    bucket: velero-backups
+    config:
+      resourceGroup: MC_rg-k8s-platform_aks-platform_eastus
+      storageAccount: aksplatformbackups
+      subscriptionId: YOUR_SUBSCRIPTION_ID
+  volumeSnapshotLocation:
+    name: default
+    provider: azure
+    config:
+      resourceGroup: MC_rg-k8s-platform_aks-platform_eastus
+      subscriptionId: YOUR_SUBSCRIPTION_ID
+
+initContainers:
+  - name: velero-plugin-for-azure
+    image: velero/velero-plugin-for-microsoft-azure:v1.8.0
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+
+# Backup schedules
+schedules:
+  daily-backup:
+    disabled: false
+    schedule: "0 2 * * *"
+    template:
+      ttl: "720h"
+      includeClusterResources: true
+      excludedNamespaces:
+      - kube-system
+      - kube-public
+      - kube-node-lease
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
