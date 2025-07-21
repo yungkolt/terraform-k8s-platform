@@ -331,7 +331,7 @@ git push origin feature/awesome-improvement
 - 📚 **Documentation**: [Architecture Guide](docs/ARCHITECTURE.md) | [Operations Manual](docs/OPERATIONS.md)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/yungkolt/terraform-k8s-platform/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/yungkolt/terraform-k8s-platform/discussions)
-- 📧 **Contact**: platform-team@yourcompany.com
+- 📧 **Contact**: koltsmi04@gmail.com
 
 ## 📄 License
 
