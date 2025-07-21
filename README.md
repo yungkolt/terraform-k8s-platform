@@ -11,32 +11,11 @@
     ╰─────────────────────────────────────────────────────────────╯
             Production-Ready Kubernetes on Azure AKS
 ```
-
 [![Build Status](https://github.com/yungkolt/terraform-k8s-platform/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/yungkolt/terraform-k8s-platform/actions)
 [![Azure](https://img.shields.io/badge/Azure-AKS-blue)](https://azure.microsoft.com/en-us/services/kubernetes-service/)
 [![Terraform](https://img.shields.io/badge/Terraform-1.5+-purple)](https://www.terraform.io/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-1.28+-blue)](https://kubernetes.io/)
 
-## 👨‍💻 Meet Your Platform Engineer
-
-```
-                    ╭─────────────────╮
-                    │   ┌─┐  ┌─┐      │
-                    │   │ │  │ │ 👓   │  <- Blond IT guy with glasses
-                    │   └─┘  └─┘      │     working on K8s magic
-                    │      ___        │
-                    │     \___/       │
-                    ╰─────────────────╯
-                           │
-                    ╭──────┴──────╮
-                    │ ⌨️  💻  🖱️  │  <- Building cloud-native platforms
-                    │ ╔═══════════╗│     with enterprise-grade features
-                    │ ║ $ kubectl ║│
-                    │ ║ apply -f  ║│
-                    │ ║ awesome/  ║│
-                    │ ╚═══════════╝│
-                    ╰─────────────╯
-```
 
 ## 🌟 What Makes This Platform Special?
 
