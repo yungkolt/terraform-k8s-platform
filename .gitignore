@@ -19,3 +19,39 @@ kubeconfig
 # IDE
 .vscode/
 .idea/
+
+# Additional Terraform
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Kubernetes
+**/kustomization.yaml.tmp
+**/kustomization.yml.tmp
+
+# Local development
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Scripts
+*.log
+*.pid
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# macOS
+.AppleDouble
+.LSOverride
