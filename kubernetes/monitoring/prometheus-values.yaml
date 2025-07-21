@@ -1,6 +1,17 @@
-# Custom values for kube-prometheus-stack
+# Secure Prometheus Stack Configuration
 grafana:
-  adminPassword: SecurePass123!
+  adminPassword: "SecureP@ssw0rd123!"  # Change this in production
+  
+  persistence:
+    enabled: true
+    storageClassName: managed-premium
+    size: 10Gi
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 472
+    fsGroup: 472
+
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -12,19 +23,6 @@ grafana:
       - secretName: grafana-tls
         hosts:
           - grafana.yourdomain.com
-  
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-      - name: 'default'
-        orgId: 1
-        folder: 'Kubernetes'
-        type: file
-        disableDeletion: false
-        editable: true
-        options:
-          path: /var/lib/grafana/dashboards/default
 
 prometheus:
   prometheusSpec:
@@ -38,9 +36,18 @@ prometheus:
             requests:
               storage: 50Gi
     
-    serviceMonitorSelectorNilUsesHelmValues: false
-    podMonitorSelectorNilUsesHelmValues: false
-    ruleSelectorNilUsesHelmValues: false
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+    
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 8Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
 
 alertmanager:
   alertmanagerSpec:
@@ -53,8 +60,7 @@ alertmanager:
             requests:
               storage: 10Gi
 
-# Enable monitoring for ingress controller
-prometheus-node-exporter:
+nodeExporter:
   tolerations:
     - effect: NoSchedule
       operator: Exists
