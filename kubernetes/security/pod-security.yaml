@@ -1,0 +1,25 @@
+# Pod Security Standards for production namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+  labels:
+    name: production
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Resource quota for cost control
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "5"
+    count/pods: "50"

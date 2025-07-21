@@ -55,3 +55,12 @@ tmp/
 # macOS
 .AppleDouble
 .LSOverride
+
+# Simplified structure - ignore backup directories
+.backup/
+**/backup-*
+
+# Temporary enhancement files
+**/force-cleanup-*
+**/temp-*
+**/MONITORING-CLEANUP-*

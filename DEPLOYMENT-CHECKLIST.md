@@ -19,10 +19,9 @@
 
 - [ ] Deploy platform: `./scripts/deploy-platform.sh`
 - [ ] Install GitOps: `./scripts/install-flux.sh`
-- [ ] Install service mesh: `./scripts/install-linkerd.sh` (optional)
 - [ ] Install backup: `./scripts/install-velero.sh`
 
-## Validation ✅
+## Validation
 
 - [ ] Run validation: `./scripts/validate-platform.sh`
 - [ ] Check monitoring: Access Grafana dashboard

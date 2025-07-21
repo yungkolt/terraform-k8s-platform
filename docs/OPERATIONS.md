@@ -137,3 +137,35 @@ Uncordon node:
 | View resources | kubectl top nodes |
 | Get services | kubectl get svc -A |
 | Describe ingress | kubectl describe ingress -A |
+
+## Simplified Operations
+
+### Quick Deployment
+```bash
+# Deploy entire platform
+./scripts/deploy-platform.sh
+
+# Validate deployment
+./scripts/validate-platform.sh
+```
+
+### Security Operations
+```bash
+# Check network policies
+kubectl get networkpolicies --all-namespaces
+
+# Verify RBAC
+kubectl auth can-i --list
+
+# Check pod security
+kubectl get pods --all-namespaces -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.securityContext.runAsNonRoot}{"\n"}{end}'
+```
+
+### Monitoring Operations
+```bash
+# Access Grafana
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80
+
+# Check platform health
+kubectl get pods --all-namespaces | grep -v Running
+```
