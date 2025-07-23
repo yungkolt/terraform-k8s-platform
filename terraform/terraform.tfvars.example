@@ -1,0 +1,34 @@
+# Example Terraform configuration
+# Copy to terraform.tfvars and customize
+
+resource_group_name = "rg-k8s-platform"
+location           = "eastus"
+cluster_name       = "aks-platform"
+environment        = "production"
+
+# Domain configuration (required)
+domain_name = "example.com"
+cert_email  = "admin@example.com"
+
+# Optional: Custom node pools
+# node_pools = {
+#   system = {
+#     vm_size         = "Standard_D2s_v3"
+#     node_count      = 2
+#     min_count       = 2
+#     max_count       = 4
+#     os_disk_size_gb = 100
+#     priority        = "Regular"
+#     spot_max_price  = -1
+#   }
+# }
+
+# Optional: Feature toggles
+enable_service_mesh = true
+enable_monitoring   = true
+enable_backup       = true
+enable_gitops       = true
+
+# Budget configuration
+budget_limit = 500
+budget_alert_emails = ["admin@example.com"]
