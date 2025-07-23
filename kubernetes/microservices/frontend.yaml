@@ -74,10 +74,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - shop.yourdomain.com
+    - shop.DOMAIN_PLACEHOLDER
     secretName: frontend-tls
   rules:
-  - host: shop.yourdomain.com
+  - host: shop.DOMAIN_PLACEHOLDER
     http:
       paths:
       - path: /

@@ -11,10 +11,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - app.yourdomain.com
+    - app.DOMAIN_PLACEHOLDER
     secretName: platform-tls
   rules:
-  - host: app.yourdomain.com
+  - host: app.DOMAIN_PLACEHOLDER
     http:
       paths:
       - path: /
