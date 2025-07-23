@@ -64,3 +64,5 @@ tmp/
 **/force-cleanup-*
 **/temp-*
 **/MONITORING-CLEANUP-*
+deployment-summary.txt
+platform-deployment.log
